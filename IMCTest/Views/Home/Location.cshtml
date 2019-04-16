@@ -1,0 +1,85 @@
+﻿@model WebAppMVC.Models.Location
+
+@{
+    ViewBag.Title = "Step 2 - Location";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>AddressDetails</title>
+</head>
+<body>
+    
+    <script type="text/javascript">
+
+    function getCities() {
+        var stateID = $('#DropDownListStates').val();
+        if (stateID > 0)
+        {
+            $.ajax({
+                url: "@Url.Action("GetJsonCity","Home")",
+                data: { stateId: stateID },
+                dataType: "json",
+                type: "GET",
+                success: function (data) {
+                    var items = "";
+                    items = "<option value=''>--Choose City--</option>";
+                    $.each(data, function (i, item) {
+                        items += "<option value=\"" + item.Value + "\">" + item.Text + "</option>";
+                    });
+                    $('#DropDownListCities').html(items);
+                }
+            });
+        }
+    }
+    </script>
+    @using (Html.BeginForm("Location", "Home", FormMethod.Post))
+    {
+        @Html.AntiForgeryToken()
+        <div class="form-horizontal">
+            <h4>Step 2 : Location Details</h4>
+            <hr />
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            <div class="form-group">
+                @Html.LabelFor(m => m.StreetAddress, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.TextBoxFor(m => m.StreetAddress)
+                    @Html.ValidationMessageFor(m => m.StreetAddress)
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.Unit, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.TextBoxFor(m => m.Unit)
+                    @Html.ValidationMessageFor(m => m.Unit)
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.City, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.DropDownListFor(model => model.City, new SelectList(Model.City, "City_ID", "State_ID", "City_Name"), "Choose City", new { @id = "DropDownListCities" })
+                    @Html.ValidationMessageFor(m => m.City)
+
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.Province, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.DropDownListFor(model => model.Province, new SelectList(Model.Province, "State_ID", "State_Name"), "Choose State", new { onchange = "getCities()", @id = "DropDownListStates" })                    
+                    @Html.ValidationMessageFor(m => m.Province)
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-md-offset-2 col-md-10">
+                    <input type="submit" name="prevBtn" value='Previous' class="btn btn-default" />
+                    <input type="submit" name="nextBtn" value='Next' class="btn btn-default" />
+                </div>
+            </div>
+        </div>
+    }
+</body>
+</html>
